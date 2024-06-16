@@ -2,13 +2,12 @@ import {Component, inject} from '@angular/core';
 import {Subscription} from "rxjs";
 import {weatherDataModel} from "../models/weatherData.model";
 import {IndexService} from "../services/index.service";
-import * as moment from "moment";
+import moment from 'moment/moment.js';
 import {TranslateService} from "@ngx-translate/core";
 import {LoaderService} from "../services/loader.service";
 import {resultDataModel} from "../models/resultData.model";
-import {dataModel} from "../models/data.model";
 import {reportNowModel} from "../models/reportNow.model";
-import {Time} from "@angular/common";
+import {reportFiveDaysModel} from "../models/reportFiveDays.model";
 
 @Component({
   selector: 'app-index',
@@ -17,9 +16,7 @@ import {Time} from "@angular/common";
 })
 export class IndexComponent {
   weatherData: weatherDataModel[] = [];
-  reportData: resultDataModel = {
-    data: []
-  };
+  reportFiveDays: reportFiveDaysModel[] = [];
   reportNow: reportNowModel = {
     description: '',
     min: 0,
@@ -38,8 +35,7 @@ export class IndexComponent {
   }
 
   ngOnInit(): void {
-    this.getWeatherData();
-    this.getTime();
+    this.refreshData();
   }
 
   getTime() {
@@ -53,8 +49,8 @@ export class IndexComponent {
     this.reportDataSub = this.iService.getWeatherData().subscribe(value => {
       console.error('getWeatherData')
       console.error(value)
-      this.reportData = this.iService.getFiveDaysReport(value);
-      this.reportNow = this.iService.getNowReport(value);
+      this.reportNow = this.iService.getReportNow(value);
+      this.reportFiveDays = this.iService.getReportFiveDays(value);
       this.loaderService.setLoading(false);
     });
   }

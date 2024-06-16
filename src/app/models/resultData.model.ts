@@ -1,5 +1,5 @@
-import {dataModel} from "./data.model";
+import {reportFiveDaysModel} from "./reportFiveDays.model";
 
 export interface resultDataModel {
-  data: dataModel[];
+  data: reportFiveDaysModel[];
 }

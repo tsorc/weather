@@ -1,11 +1,13 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, map, Observable, Subscription, tap} from "rxjs";
 import {weatherDataModel} from "../models/weatherData.model";
-import {HttpClient} from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import {weatherModel} from "../models/weather.model";
 import {listDataModel} from "../models/listData.model";
 import {resultDataModel} from "../models/resultData.model";
 import {reportNowModel} from "../models/reportNow.model";
+import {reportFiveDaysModel} from "../models/reportFiveDays.model";
+import {dataModel} from "../models/data.model";
 
 @Injectable({
   providedIn: 'root'
@@ -15,15 +17,16 @@ export class IndexService {
   listData = new BehaviorSubject<listDataModel[]>([]);
   weatherDataSub = new Subscription();
   appId = 'db010d505fd0e52023ed41ae1e81da11';
-  showData: weatherDataModel[] = [];
-  report: resultDataModel = {
-    data: []
-  };
   reportNow: reportNowModel = {
     description: '',
     min: 0,
     max: 0
   };
+  reportFiveDays: reportFiveDaysModel[] = [{
+    date: '',
+    data: []
+  }];
+  dateList: string[] = [];
 
   constructor(
     private http: HttpClient,
@@ -35,20 +38,13 @@ export class IndexService {
     this.weatherDataSub = this.http.get<weatherModel>(openWeatherMapUrl)
       .pipe(
         map(val => {
-          /*val.list.map((data, index) => {
-            let date = this.getDate(data.dt_txt);
-            /!*val.result[index].date = [];
-            //val.result[index].date.push(date);
-            val.result[index].date.push(date);*!/
+          val.list.map((data, index) => {
+            let dateTime = data.dt_txt.split(' ');
+            let date = dateTime[0];
             data.date = date;
-
-            return data; // return randomized answers
-          })*/
+            return data;
+          })
           return val;
-        }),
-        tap(data => {
-          console.log('Data');
-          console.log(data);
         })
       )
       .subscribe((response) => {
@@ -58,34 +54,7 @@ export class IndexService {
       });
   }
 
-  getFiveDaysReport(data: listDataModel[]) {
-    console.error('getFiveDaysReport')
-    console.error(data)
-
-    data.map((data, i) => {
-      let dateTime = data.dt_txt.split(' ');
-      let date = dateTime[0];
-      let time = dateTime[1];
-      this.report.data[i] = {
-        date: '',
-        time: '',
-        temp: 0,
-        description: ''
-      };
-      console.error(date)
-      this.report.data[i].date = date;
-      this.report.data[i].time = time;
-      this.report.data[i].temp = this.convertKelvinToDegrees(data.main.temp);
-      this.report.data[i].description = data.weather[0].description;
-      console.error(this.report)
-
-      return this.report;
-    })
-
-    return this.report;
-  }
-
-  getNowReport(data: listDataModel[]) {
+  getReportNow(data: listDataModel[]) {
     if (data[0]) {
       this.reportNow.description = data[0].weather[0].description;
       this.reportNow.min = this.convertKelvinToDegrees(data[0].main.temp_min);
@@ -93,6 +62,51 @@ export class IndexService {
     }
 
     return this.reportNow;
+  }
+
+  getReportFiveDays(data: listDataModel[]) {
+    this.reportFiveDays.map((dataInfo, k)=> {
+      dataInfo.data = [];
+      return dataInfo;
+    });
+
+    console.log('reportFiveDays - clean');
+    console.log(this.reportFiveDays);
+
+    data.map((data, i) => {
+      let dateTime = data.dt_txt.split(' ');
+      let date = dateTime[0];
+      let time = dateTime[1];
+
+      this.reportFiveDays.map(dataInfo=> {
+        if (!this.dateList.includes(date)) {
+          let dateInfo = {
+            date: date,
+            data: []
+          };
+
+          this.dateList.push(date);
+          this.reportFiveDays.push(dateInfo);
+        }
+      });
+
+      this.reportFiveDays.map((dataReport, j) => {
+        if (date === dataReport.date) {
+          let reportInfo = {
+            time: time,
+            temp: this.convertKelvinToDegrees(data.main.temp),
+            description: data.weather[0].description
+          };
+
+          this.reportFiveDays[j].data.push(reportInfo);
+        }
+      });
+    })
+
+    console.log('report');
+    console.log(this.reportFiveDays);
+
+    return this.reportFiveDays;
   }
 
   convertKelvinToDegrees(kelvin: string) {
