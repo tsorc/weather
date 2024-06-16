@@ -1,0 +1,69 @@
+$background-color: grey;
+$header-background-color: #e86e1e;
+$header-text-color: blue;
+
+:host {
+  background-color: $background-color;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  min-width: 320px;
+  height: 480px;
+
+  .header {
+    background-color: $header-background-color;
+    color: $header-text-color;
+    height: 44px;
+    width: 100%;
+    position: sticky;
+    border: 1px blue solid;
+  }
+
+  .container {
+    border: 1px orange solid;
+    height: 100%;
+    margin: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .time-stamp {
+      border: 1px green solid;
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .fields {
+      display: flex;
+      height: 100%;
+      width: 100%;
+
+      .field-left {
+        border: 1px brown solid;
+        width: 50%;
+      }
+
+      .field-right {
+        border: 1px brown solid;
+        width: 50%;
+      }
+    }
+  }
+}
+
+@media only screen and (min-width: 768px) and (min-height: 768px) {
+
+  :host {
+    .header {
+      height: 56px;
+    }
+
+    .container {
+      margin: 32px;
+      width: 460px;
+    }
+  }
+}

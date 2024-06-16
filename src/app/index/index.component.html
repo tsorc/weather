@@ -1,0 +1,33 @@
+<div class="header">
+  <button type="button" (click)="refreshData()">Osveži</button>
+
+  <button (click)="switchLanguage('si')">Slovenščina</button>
+  <button (click)="switchLanguage('en')">English</button>
+</div>
+<div class="container">
+  <div class="time-stamp">
+    <div>Maribor</div>
+    <div>{{ "Updated" | translate }} {{  date }} {{ "At" | translate }} {{ time }}</div>
+  </div>
+  <div class="fields">
+    <div class="field-left">
+      <div>{{ "TemeperatureNow" | translate }}</div>
+      <ng-container *ngIf="reportNow">
+        <div>{{ reportNow.description }}</div>
+        <div>{{ reportNow.min }}</div>
+        <div>{{ reportNow.max }}</div>
+      </ng-container>
+    </div>
+    <div class="field-right">
+      <div>{{ "5DaysWeatherReport" | translate }}</div>
+      <ng-container *ngIf="reportData">
+        <div *ngFor="let result of reportData.data; let i = index">
+          <div>{{ result.date }}</div>
+          <div>{{ result.time }}</div>
+          <div>{{ result.temp }}</div>
+          <div>{{ result.description }}</div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
