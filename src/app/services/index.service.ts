@@ -86,9 +86,11 @@ export class IndexService {
   }
 
   getNowReport(data: listDataModel[]) {
-    this.reportNow.description = data[0].weather[0].description;
-    this.reportNow.min = this.convertKelvinToDegrees(data[0].main.temp_min);
-    this.reportNow.max = this.convertKelvinToDegrees(data[0].main.temp_max);
+    if (data[0]) {
+      this.reportNow.description = data[0].weather[0].description;
+      this.reportNow.min = this.convertKelvinToDegrees(data[0].main.temp_min);
+      this.reportNow.max = this.convertKelvinToDegrees(data[0].main.temp_max);
+    }
 
     return this.reportNow;
   }
