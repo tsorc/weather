@@ -5,32 +5,36 @@
     <button (click)="switchLanguage('si')">Slovenščina</button>
     <button (click)="switchLanguage('en')">English</button>
   </div>
-  <div class="container">
-    <div class="time-stamp">
-      <h3>Maribor</h3>
-      <h3>{{ "Updated" | translate }} {{  date }} {{ "At" | translate }} {{ time }}</h3>
-    </div>
-    <div class="fields">
-      <div class="field-left">
-        <h2 class="title">{{ "TemeperatureNow" | translate }}</h2>
-        <ng-container *ngIf="reportNow">
-          <div>{{ reportNow.description }}</div>
-          <div>{{ "TemeperatureMin" | translate }}: {{ reportNow.min }}</div>
-          <div>{{ "TemeperatureMax" | translate }}: {{ reportNow.max }}</div>
-        </ng-container>
+  <div class="content">
+    <div class="container">
+      <div class="time-stamp">
+        <div class="text">Maribor</div>
+        <div class="text">{{ "Updated" | translate }} {{  date }} {{ "At" | translate }} {{ time }}</div>
       </div>
-      <div class="field-right">
-        <h2 class="title">{{ "5DaysWeatherReport" | translate }}</h2>
-        <ng-container *ngIf="reportFiveDays">
-          <div *ngFor="let result of reportFiveDays; let i = index">
-            <h3>{{ result.date }}</h3>
-            <div *ngFor="let info of result.data; let i = index">
-              <div>{{ info.time }}</div>
-              <div>{{ info.temp }}</div>
-              <div>{{ info.description }}</div>
-            </div>
+      <div class="fields">
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 field-left">
+            <div class="title-text">{{ "TemeperatureNow" | translate }}</div>
+            <ng-container *ngIf="reportNow">
+              <div class="text-small">{{ reportNow.description }}</div>
+              <div class="text-small">{{ "TemeperatureMin" | translate }}: {{ reportNow.min }}</div>
+              <div class="text-small">{{ "TemeperatureMax" | translate }}: {{ reportNow.max }}</div>
+            </ng-container>
           </div>
-        </ng-container>
+          <div class="col-xs-12 col-sm-6 field-right">
+            <div class="title-text">{{ "5DaysWeatherReport" | translate }}</div>
+            <ng-container *ngIf="reportFiveDays">
+              <div class="text-container" *ngFor="let result of reportFiveDays | slice:1">
+                <div class="date-text">{{ result.date }}</div>
+                <div class="text-small-container" *ngFor="let info of result.data">
+                  <div class="text-small">{{ info.time }}</div>
+                  <div class="text-small">{{ info.description }}</div>
+                  <div class="text-small">{{ info.temp }}</div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
       </div>
     </div>
   </div>

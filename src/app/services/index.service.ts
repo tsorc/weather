@@ -1,19 +1,16 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, map, Observable, Subscription, tap} from "rxjs";
-import {weatherDataModel} from "../models/weatherData.model";
 import { HttpClient } from "@angular/common/http";
 import {weatherModel} from "../models/weather.model";
 import {listDataModel} from "../models/listData.model";
-import {resultDataModel} from "../models/resultData.model";
 import {reportNowModel} from "../models/reportNow.model";
 import {reportFiveDaysModel} from "../models/reportFiveDays.model";
-import {dataModel} from "../models/data.model";
+import moment from "moment/moment.js";
 
 @Injectable({
   providedIn: 'root'
 })
 export class IndexService {
-  weatherData = new BehaviorSubject<weatherDataModel[]>([]);
   listData = new BehaviorSubject<listDataModel[]>([]);
   weatherDataSub = new Subscription();
   appId = 'db010d505fd0e52023ed41ae1e81da11';
@@ -48,8 +45,6 @@ export class IndexService {
         })
       )
       .subscribe((response) => {
-        console.error('prepareWeatherData')
-        console.error(response.list)
         this.listData.next(response.list);
       });
   }
@@ -70,12 +65,9 @@ export class IndexService {
       return dataInfo;
     });
 
-    console.log('reportFiveDays - clean');
-    console.log(this.reportFiveDays);
-
     data.map((data, i) => {
       let dateTime = data.dt_txt.split(' ');
-      let date = dateTime[0];
+      let date = this.convertDate(dateTime[0]);
       let time = dateTime[1];
 
       this.reportFiveDays.map(dataInfo=> {
@@ -103,10 +95,11 @@ export class IndexService {
       });
     })
 
-    console.log('report');
-    console.log(this.reportFiveDays);
-
     return this.reportFiveDays;
+  }
+
+  convertDate(date: string) {
+    return moment(date).format('DD.MM.YYYY');
   }
 
   convertKelvinToDegrees(kelvin: string) {

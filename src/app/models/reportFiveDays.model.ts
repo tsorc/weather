@@ -1,6 +1,6 @@
-import {dataModel} from "./data.model";
+import {reportFiveDaysDataModel} from "./reportFiveDaysData.model";
 
 export interface reportFiveDaysModel {
   date: string;
-  data: dataModel[];
+  data: reportFiveDaysDataModel[];
 }

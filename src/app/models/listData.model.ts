@@ -1,4 +1,3 @@
-import {resultDataModel} from "./resultData.model";
 import {weatherInfoModel} from "./weatherInfo.model";
 
 export interface listDataModel {
