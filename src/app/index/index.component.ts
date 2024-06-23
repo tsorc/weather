@@ -1,11 +1,12 @@
 import {Component, inject} from '@angular/core';
-import {Subscription} from "rxjs";
+import {catchError, Subscription} from "rxjs";
 import {IndexService} from "../services/index.service";
 import moment from 'moment/moment.js';
 import {TranslateService} from "@ngx-translate/core";
-import {LoaderService} from "../services/loader.service";
 import {reportNowModel} from "../models/reportNow.model";
 import {reportFiveDaysModel} from "../models/reportFiveDays.model";
+import {LocalStorageService} from "../services/localStorage.service";
+import {LanguageService} from "../services/language.service";
 
 @Component({
   selector: 'app-index',
@@ -19,16 +20,17 @@ export class IndexComponent {
     min: 0,
     max: 0
   };
-  reportDataSub = new Subscription();
-  iService = inject(IndexService);
+  reportDataSub: Subscription = new Subscription();
+  iService: IndexService = inject(IndexService);
   date: string = '';
   time: string = '';
 
   constructor(
-    private translate: TranslateService,
-    private loaderService: LoaderService
+    private translateService: TranslateService,
+    private storageService: LocalStorageService,
+    private languageService: LanguageService
   ) {
-    this.translate.setDefaultLang('si');
+    this.translateService.setDefaultLang('si');
   }
 
   ngOnInit(): void {
@@ -46,21 +48,31 @@ export class IndexComponent {
   }
 
   getWeatherData() {
-    this.loaderService.setLoading(true);
+    this.reportNow = this.storageService.getLocalStorage('report_now');
+    this.reportFiveDays = this.storageService.getLocalStorage('report_five_days');
+
     this.iService.prepareWeatherData();
-    this.reportDataSub.unsubscribe();
-    this.reportDataSub = this.iService.getWeatherData().subscribe(value => {
-      this.reportNow = this.iService.getReportNow(value);
-      this.reportFiveDays = this.iService.getReportFiveDays(value);
-      this.loaderService.setLoading(false);
-    });
+    this.reportDataSub = this.iService.getWeatherData()
+      .pipe(
+        catchError((e) => {
+          throw new Error(e);
+        })
+      ).subscribe(value => {
+        this.reportNow = this.iService.getReportNow(value);
+        this.reportFiveDays = this.iService.getReportFiveDays(value);
+
+        this.storageService.setLocalStorageReportNow('report_now', this.reportNow);
+        this.storageService.setLocalStorageReportFiveDays('report_five_days', this.reportFiveDays);
+      });
   }
 
   switchLanguage(language: string) {
-    this.translate.use(language);
+    this.translateService.use(language);
+    this.languageService.setLanguage(language);
   }
 
   ngOnDestroy() {
     this.reportDataSub.unsubscribe();
+    //localStorage.clear();
   }
 }

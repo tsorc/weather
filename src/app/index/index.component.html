@@ -24,7 +24,7 @@
           <div class="col-xs-12 col-sm-6 field-right">
             <div class="title-text">{{ "5DaysWeatherReport" | translate }}</div>
             <ng-container *ngIf="reportFiveDays">
-              <div class="text-container" *ngFor="let result of reportFiveDays | slice:1">
+              <div class="text-container" *ngFor="let result of reportFiveDays">
                 <div class="date-text">{{ result.date }}</div>
                 <div class="text-small-container" *ngFor="let info of result.data">
                   <div class="text-small">{{ info.time }}</div>

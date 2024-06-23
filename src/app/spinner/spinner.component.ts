@@ -7,5 +7,20 @@ import {LoaderService} from "../services/loader.service";
   styleUrls: ['./spinner.component.scss']
 })
 export class SpinnerComponent {
-  constructor(public loader: LoaderService) { }
+  loading: unknown = false;
+
+  constructor(
+    public loaderService: LoaderService
+  ) { }
+
+  ngOnInit(): void {
+    this.subscribe();
+  }
+
+  private subscribe(): void {
+    this.loaderService.state
+      .subscribe(loading => {
+        this.loading = loading;
+      });
+  }
 }
