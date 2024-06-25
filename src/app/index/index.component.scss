@@ -1,56 +1,43 @@
-$background-color: white;
-$header-background-color: #e86e1e;
-$header-text-color: blue;
+@import '../../styles/base';
 
-.body-container {
-  background-color: $background-color;
-  height: 100vh;
-  margin-left: auto;
-  margin-right: auto;
-  min-height: 480px;
+.main-content {
+  background-color: $main-content-bg-color;
+  color: $main-content-color;
   width: 320px;
 
   .header {
     background-color: $header-background-color;
     color: $header-text-color;
     height: 44px;
-    width: 100%;
-    display: flex;
-    justify-content: space-evenly;
+
+    .title {
+      font-size: 0.8rem;
+      line-height: 1rem;
+    }
+
+    .flag {
+      height: 20px;
+    }
   }
 
   .content {
-    display: flex;
-    align-items: center;
-    height: calc(100vh - 44px);
+    padding: 16px;
 
-    .container {
-      height: 404px;
+    .resizable-content {
+      height: calc(100vh - 76px);
       min-height: 404px;
-      margin: 16px;
-      overflow-y: auto;
-      width: 288px;
 
       .time-stamp {
         color: $header-background-color;
-        width: 100%;
-        text-align: center;
 
-        .text {
-          font-size: 15px;
+        > div {
+          font-size: 0.9rem;
         }
       }
 
       .fields {
-        display: flex;
-        height: 100%;
-        width: 100%;
-        text-align: center;
-
-        .title-text {
-          font-size: 1.2rem;
-          font-weight: bold;
-          margin-bottom: 20px;
+        .text-big-container {
+          font-size: 2rem;
         }
 
         .date-text {
@@ -59,16 +46,13 @@ $header-text-color: blue;
         }
 
         .text-container {
-          border-bottom: dashed 1px black;
           margin-bottom: 10px;
         }
 
-        .text-small-container {
-          border-bottom: dashed 1px black;
-
-          .text-small {
-            font-size: 0.8rem;
-          }
+        .text-data-container {
+          border-bottom: solid 1px $text-data-container-color;
+          line-height: 1.6rem;
+          font-size: 0.7rem;
         }
       }
     }
@@ -76,20 +60,38 @@ $header-text-color: blue;
 }
 
 @media only screen and (min-width: 768px) and (min-height: 768px) {
-  .body-container {
+  .main-content {
     width: 460px;
 
     .header {
       height: 56px;
+
+      .title {
+        font-size: 1rem;
+      }
+
+      .flag {
+        height: 23px;
+      }
     }
 
     .content {
-      display: flex;
-      height: calc(100vh - 56px);
+      padding: 32px;
 
-      .container {
-        margin: 32px;
-        width: 396px;
+      .resizable-content {
+        height: calc(100vh - 120px);
+
+        .time-stamp {
+          > div {
+            font-size: 1.1rem;
+          }
+        }
+
+        .fields {
+          .text-small-container {
+            font-size: 0.8rem;
+          }
+        }
       }
     }
   }

@@ -1,38 +1,46 @@
-<div class="body-container">
-  <div class="header">
-    <button type="button" (click)="refreshData()">Osveži</button>
-
-    <button (click)="switchLanguage('si')">Slovenščina</button>
-    <button (click)="switchLanguage('en')">English</button>
-  </div>
-  <div class="content">
-    <div class="container">
-      <div class="time-stamp">
-        <div class="text">Maribor</div>
-        <div class="text">{{ "Updated" | translate }} {{  date }} {{ "At" | translate }} {{ time }}</div>
+<div class="main d-flex flex-column align-items-center justify-content-start h-100">
+  <div class="main-content">
+    <div class="header d-flex justify-content-around align-items-center position-relative text-center">
+      <div class="w-25">
+        <button type="button" class="btn btn-primary btn-sm" (click)="refreshData()"><i class="fa fa-refresh" aria-hidden="true"></i></button>
       </div>
-      <div class="fields">
-        <div class="row">
-          <div class="col-xs-12 col-sm-6 field-left">
-            <div class="title-text">{{ "TemeperatureNow" | translate }}</div>
-            <ng-container *ngIf="reportNow">
-              <div class="text-small">{{ reportNow.description }}</div>
-              <div class="text-small">{{ "TemeperatureMin" | translate }}: {{ reportNow.min }}</div>
-              <div class="text-small">{{ "TemeperatureMax" | translate }}: {{ reportNow.max }}</div>
-            </ng-container>
-          </div>
-          <div class="col-xs-12 col-sm-6 field-right">
-            <div class="title-text">{{ "5DaysWeatherReport" | translate }}</div>
-            <ng-container *ngIf="reportFiveDays">
-              <div class="text-container" *ngFor="let result of reportFiveDays">
-                <div class="date-text">{{ result.date }}</div>
-                <div class="text-small-container" *ngFor="let info of result.data">
-                  <div class="text-small">{{ info.time }}</div>
-                  <div class="text-small">{{ info.description }}</div>
-                  <div class="text-small">{{ info.temp }}</div>
+      <div class="title w-50">
+        {{ "5DaysWeatherReport" | translate }}
+      </div>
+      <div class="buttons w-25">
+        <input type="image" src="/assets/images/si.svg" class="flag me-2" alt="image" [disabled]="language == 'si'" (click)="switchLanguage('si')" />
+        <input type="image" src="/assets/images/en.svg" class="flag" alt="image" [disabled]="language != 'si'" (click)="switchLanguage('en')" />
+      </div>
+    </div>
+    <div class="content">
+      <div class="resizable-content overflow-y-auto overflow-x-hidden">
+        <div class="time-stamp text-center">
+          <div>{{ place }}</div>
+          <div>{{ "Updated" | translate }} {{  date }} {{ "At" | translate }} {{ time }}</div>
+        </div>
+        <div class="fields text-center mt-4">
+          <div class="row">
+            <div class="col-xs-12 col-sm-6 field-left mb-4">
+              <ng-container *ngIf="reportNow">
+                <div class="text-big-container">
+                  {{ reportNow.min }}&deg;C
                 </div>
-              </div>
-            </ng-container>
+                <div>{{ "TemeperatureMax" | translate }} {{ reportNow.max }}&deg;C</div>
+                <div>{{ reportNow.description }}</div>
+              </ng-container>
+            </div>
+            <div class="col-xs-12 col-sm-6 field-right">
+              <ng-container *ngIf="reportFiveDays">
+                <div class="text-container" *ngFor="let result of reportFiveDays">
+                  <div class="date-text">{{ result.date }}</div>
+                  <div class="text-data-container d-flex justify-content-between me-2" *ngFor="let info of result.data">
+                    <div class="w-25">{{ info.time }}</div>
+                    <div class="w-50">{{ info.description }}</div>
+                    <div class="w-25 fw-bold">{{ info.temp }}&deg;C</div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
           </div>
         </div>
       </div>

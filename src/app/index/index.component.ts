@@ -24,6 +24,8 @@ export class IndexComponent {
   iService: IndexService = inject(IndexService);
   date: string = '';
   time: string = '';
+  language: string = '';
+  place: string = 'Maribor';
 
   constructor(
     private translateService: TranslateService,
@@ -31,6 +33,7 @@ export class IndexComponent {
     private languageService: LanguageService
   ) {
     this.translateService.setDefaultLang('si');
+    this.language = 'si';
   }
 
   ngOnInit(): void {
@@ -69,10 +72,10 @@ export class IndexComponent {
   switchLanguage(language: string) {
     this.translateService.use(language);
     this.languageService.setLanguage(language);
+    this.language = language;
   }
 
   ngOnDestroy() {
     this.reportDataSub.unsubscribe();
-    //localStorage.clear();
   }
 }

@@ -1,8 +1,6 @@
 {
   "Updated": "pridobljeno",
   "At": "ob",
-  "TemeperatureNow": "Trenutna temperatura",
-  "TemeperatureMin": "Min",
-  "TemeperatureMax": "Max",
+  "TemeperatureMax": "Največ",
   "5DaysWeatherReport": "5 dnevna vremenska napoved"
 }

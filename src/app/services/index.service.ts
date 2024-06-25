@@ -94,7 +94,7 @@ export class IndexService {
       this.reportFiveDays.map((dataReport: reportFiveDaysModel, j: number): void => {
         if (date === dataReport.date) {
           let reportInfo = {
-            time: time,
+            time: this.convertTimeToShort(time),
             temp: this.convertKelvinToDegrees(data.main.temp),
             description: data.weather[0].description
           };
@@ -109,6 +109,10 @@ export class IndexService {
 
   convertDateToSlo(date: string): string {
     return moment(date).format('DD.MM.YYYY');
+  }
+
+  convertTimeToShort(time: string): string {
+    return time.substring(0, time.length - 3);
   }
 
   convertKelvinToDegrees(kelvin: string): number {
