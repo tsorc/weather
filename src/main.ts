@@ -15,11 +15,12 @@ import { provideHttpClient, withInterceptorsFromDi, HttpClient } from '@angular/
 bootstrapApplication(AppComponent, {
     providers: [
         importProvidersFrom(BrowserModule, AppRoutingModule, TranslateModule.forRoot({
-            loader: {
-                provide: TranslateLoader,
-                useFactory: HttpLoaderFactory,
-                deps: [HttpClient],
-            }
+          defaultLanguage: 'sl',
+          loader: {
+              provide: TranslateLoader,
+              useFactory: HttpLoaderFactory,
+              deps: [HttpClient],
+          }
         }), NgbModule),
         provideHttpClient(withInterceptorsFromDi())
     ]

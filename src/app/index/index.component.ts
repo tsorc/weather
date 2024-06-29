@@ -6,7 +6,6 @@ import { TranslateService, TranslateModule } from "@ngx-translate/core";
 import {reportNowModel} from "../models/reportNow.model";
 import {reportFiveDaysModel} from "../models/reportFiveDays.model";
 import {LocalStorageService} from "../services/localStorage.service";
-import {LanguageService} from "../services/language.service";
 import { NgIf, NgFor } from '@angular/common';
 
 @Component({
@@ -27,19 +26,15 @@ export class IndexComponent {
   iService: IndexService = inject(IndexService);
   date: string = '';
   time: string = '';
-  language: string = '';
   place: string = 'Maribor';
 
   constructor(
-    private translateService: TranslateService,
-    private storageService: LocalStorageService,
-    private languageService: LanguageService
-  ) {
-    this.translateService.setDefaultLang('si');
-    this.language = 'si';
-  }
+    public translateService: TranslateService,
+    private storageService: LocalStorageService
+  ) {}
 
   ngOnInit(): void {
+    this.translateService.use(this.translateService.getDefaultLang());
     this.refreshData();
   }
 
@@ -74,8 +69,6 @@ export class IndexComponent {
 
   switchLanguage(language: string) {
     this.translateService.use(language);
-    this.languageService.setLanguage(language);
-    this.language = language;
   }
 
   ngOnDestroy() {

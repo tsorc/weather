@@ -6,8 +6,8 @@ import {listDataModel} from "../models/listData.model";
 import {reportNowModel} from "../models/reportNow.model";
 import {reportFiveDaysModel} from "../models/reportFiveDays.model";
 import moment from "moment/moment.js";
-import {LanguageService} from "./language.service";
 import {LoaderService} from "./loader.service";
+import {LangChangeEvent, TranslateService} from "@ngx-translate/core";
 
 @Injectable({
   providedIn: 'root'
@@ -23,21 +23,19 @@ export class IndexService {
   };
   reportFiveDays: reportFiveDaysModel[] = [];
   dateList: string[] = [];
-  language: string = '';
 
   constructor(
     private httpService: HttpClient,
     private loaderService: LoaderService,
-    private languageService: LanguageService
+    private translateService: TranslateService
   ) { }
 
   prepareWeatherData(): void {
     this.loaderService.show();
-    this.languageService.getLanguage().subscribe(language => {
-      this.language = language;
 
+    this.translateService.onLangChange.subscribe((event: LangChangeEvent) => {
       // By zip code: https://api.openweathermap.org/data/2.5/forecast?zip=2000,si&appid=
-      const openWeatherMapUrl: string = 'https://api.openweathermap.org/data/2.5/forecast?q=maribor&appid=' + this.appId + '&lang=' + this.language;
+      const openWeatherMapUrl: string = 'https://api.openweathermap.org/data/2.5/forecast?q=maribor&appid=' + this.appId + '&lang=' + event.lang;
       this.weatherDataSub = this.httpService.get<weatherModel>(openWeatherMapUrl)
         .pipe(
           catchError(e => {
@@ -57,7 +55,7 @@ export class IndexService {
           this.listData.next(response.list);
           this.loaderService.hide();
         });
-    })
+    });
   }
 
   getReportNow(data: listDataModel[]): reportNowModel {

@@ -8,8 +8,8 @@
         {{ "5DaysWeatherReport" | translate }}
       </div>
       <div class="buttons w-25">
-        <input type="image" src="/assets/images/si.svg" class="flag me-2" alt="image" [disabled]="language == 'si'" (click)="switchLanguage('si')" />
-        <input type="image" src="/assets/images/en.svg" class="flag" alt="image" [disabled]="language != 'si'" (click)="switchLanguage('en')" />
+        <input type="image" src="/assets/images/si.svg" class="flag me-2" alt="image" [disabled]="translateService.currentLang == 'sl'" (click)="switchLanguage('sl')" />
+        <input type="image" src="/assets/images/en.svg" class="flag" alt="image" [disabled]="translateService.currentLang != 'sl'" (click)="switchLanguage('en')" />
       </div>
     </div>
     <div class="content">
