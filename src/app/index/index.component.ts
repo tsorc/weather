@@ -2,16 +2,19 @@ import {Component, inject} from '@angular/core';
 import {catchError, Subscription} from "rxjs";
 import {IndexService} from "../services/index.service";
 import moment from 'moment/moment.js';
-import {TranslateService} from "@ngx-translate/core";
+import { TranslateService, TranslateModule } from "@ngx-translate/core";
 import {reportNowModel} from "../models/reportNow.model";
 import {reportFiveDaysModel} from "../models/reportFiveDays.model";
 import {LocalStorageService} from "../services/localStorage.service";
 import {LanguageService} from "../services/language.service";
+import { NgIf, NgFor } from '@angular/common';
 
 @Component({
-  selector: 'app-index',
-  templateUrl: './index.component.html',
-  styleUrls: ['./index.component.scss']
+    selector: 'app-index',
+    templateUrl: './index.component.html',
+    styleUrls: ['./index.component.scss'],
+    standalone: true,
+    imports: [NgIf, NgFor, TranslateModule]
 })
 export class IndexComponent {
   reportFiveDays: reportFiveDaysModel[] = [];

@@ -1,10 +1,13 @@
 import { Component } from '@angular/core';
-import {TranslateService} from "@ngx-translate/core";
+import { SpinnerComponent } from './spinner/spinner.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: true,
+    imports: [RouterOutlet, SpinnerComponent]
 })
 export class AppComponent {
   title = 'weatherapp';
