@@ -8,6 +8,7 @@ import {reportFiveDaysModel} from "../models/reportFiveDays.model";
 import moment from "moment/moment.js";
 import {LoaderService} from "./loader.service";
 import {LangChangeEvent, TranslateService} from "@ngx-translate/core";
+import {weatherUrlCity, appId, slDateFormat, addLanguage} from '../config';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,6 @@ import {LangChangeEvent, TranslateService} from "@ngx-translate/core";
 export class IndexService {
   listData: BehaviorSubject<listDataModel[]> = new BehaviorSubject<listDataModel[]>([]);
   weatherDataSub: Subscription = new Subscription();
-  appId: string = 'db010d505fd0e52023ed41ae1e81da11';
   reportNow: reportNowModel = {
     description: '',
     min: 0,
@@ -34,8 +34,7 @@ export class IndexService {
     this.loaderService.show();
 
     this.translateService.onLangChange.subscribe((event: LangChangeEvent) => {
-      // By zip code: https://api.openweathermap.org/data/2.5/forecast?zip=2000,si&appid=
-      const openWeatherMapUrl: string = 'https://api.openweathermap.org/data/2.5/forecast?q=maribor&appid=' + this.appId + '&lang=' + event.lang;
+      const openWeatherMapUrl: string = weatherUrlCity + appId + addLanguage + event.lang;
       this.weatherDataSub = this.httpService.get<weatherModel>(openWeatherMapUrl)
         .pipe(
           catchError(e => {
@@ -106,7 +105,7 @@ export class IndexService {
   }
 
   convertDateToSlo(date: string): string {
-    return moment(date).format('DD.MM.YYYY');
+    return moment(date).format(slDateFormat);
   }
 
   convertTimeToShort(time: string): string {

@@ -17,7 +17,7 @@ export class LocalStorageService {
   }
 
   getLocalStorage(key: string) {
-    if (localStorage.getItem('report_now') !== null) {
+    if (localStorage.getItem(key) !== null) {
       return JSON.parse(localStorage.getItem(key) || '{}');
     }
   }

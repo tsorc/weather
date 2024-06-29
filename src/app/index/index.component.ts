@@ -7,6 +7,7 @@ import {reportNowModel} from "../models/reportNow.model";
 import {reportFiveDaysModel} from "../models/reportFiveDays.model";
 import {LocalStorageService} from "../services/localStorage.service";
 import { NgIf, NgFor } from '@angular/common';
+import {city, localStorageReportFiveDays, localStorageReportNow} from "../config";
 
 @Component({
     selector: 'app-index',
@@ -16,6 +17,7 @@ import { NgIf, NgFor } from '@angular/common';
     imports: [NgIf, NgFor, TranslateModule]
 })
 export class IndexComponent {
+  protected readonly city = city;
   reportFiveDays: reportFiveDaysModel[] = [];
   reportNow: reportNowModel = {
     description: '',
@@ -26,7 +28,6 @@ export class IndexComponent {
   iService: IndexService = inject(IndexService);
   date: string = '';
   time: string = '';
-  place: string = 'Maribor';
 
   constructor(
     public translateService: TranslateService,
@@ -49,8 +50,8 @@ export class IndexComponent {
   }
 
   getWeatherData() {
-    this.reportNow = this.storageService.getLocalStorage('report_now');
-    this.reportFiveDays = this.storageService.getLocalStorage('report_five_days');
+    this.reportNow = this.storageService.getLocalStorage(localStorageReportNow);
+    this.reportFiveDays = this.storageService.getLocalStorage(localStorageReportFiveDays);
 
     this.iService.prepareWeatherData();
     this.reportDataSub = this.iService.getWeatherData()
@@ -62,8 +63,8 @@ export class IndexComponent {
         this.reportNow = this.iService.getReportNow(value);
         this.reportFiveDays = this.iService.getReportFiveDays(value);
 
-        this.storageService.setLocalStorageReportNow('report_now', this.reportNow);
-        this.storageService.setLocalStorageReportFiveDays('report_five_days', this.reportFiveDays);
+        this.storageService.setLocalStorageReportNow(localStorageReportNow, this.reportNow);
+        this.storageService.setLocalStorageReportFiveDays(localStorageReportFiveDays, this.reportFiveDays);
       });
   }
 

@@ -1,0 +1,9 @@
+export const appName: string = 'weatherapp';
+export const city: string = 'Maribor';
+export const weatherUrlCity: string = 'https://api.openweathermap.org/data/2.5/forecast?q=maribor&appid=';
+export const weatherUrlZipCode: string = 'https://api.openweathermap.org/data/2.5/forecast?zip=2000,si&appid=';
+export const appId: string = 'db010d505fd0e52023ed41ae1e81da11';
+export const addLanguage: string = '&lang=';
+export const localStorageReportNow: string = 'report_now';
+export const localStorageReportFiveDays: string = 'report_five_days';
+export const slDateFormat: string = 'DD.MM.YYYY';
