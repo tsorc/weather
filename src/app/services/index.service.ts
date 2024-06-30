@@ -8,7 +8,15 @@ import {reportFiveDaysModel} from "../models/reportFiveDays.model";
 import moment from "moment/moment.js";
 import {LoaderService} from "./loader.service";
 import {LangChangeEvent, TranslateService} from "@ngx-translate/core";
-import {weatherUrlCity, appId, slDateFormat, addLanguage} from '../config';
+import {
+  weatherUrlCity,
+  appId,
+  slDateFormat,
+  addLanguage,
+  localStorageReportNow,
+  localStorageReportFiveDays
+} from '../config';
+import {LocalStorageService} from "./localStorage.service";
 
 @Injectable({
   providedIn: 'root'
@@ -16,25 +24,31 @@ import {weatherUrlCity, appId, slDateFormat, addLanguage} from '../config';
 export class IndexService {
   listData: BehaviorSubject<listDataModel[]> = new BehaviorSubject<listDataModel[]>([]);
   weatherDataSub: Subscription = new Subscription();
-  reportNow: reportNowModel = {
+  repData = {
     description: '',
     min: 0,
     max: 0
   };
-  reportFiveDays: reportFiveDaysModel[] = [];
+  reportNow: BehaviorSubject<reportNowModel> = new BehaviorSubject<reportNowModel>(this.repData);
+  reportNowData: reportNowModel = this.repData;
+  reportFiveDaysData: reportFiveDaysModel[] = [];
+  reportFiveDays: BehaviorSubject<reportFiveDaysModel[]> = new BehaviorSubject<reportFiveDaysModel[]>([])
   dateList: string[] = [];
+  language: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   constructor(
     private httpService: HttpClient,
     private loaderService: LoaderService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private storageService: LocalStorageService
   ) { }
 
   prepareWeatherData(): void {
     this.loaderService.show();
+    this.getLanguage();
 
-    this.translateService.onLangChange.subscribe((event: LangChangeEvent) => {
-      const openWeatherMapUrl: string = weatherUrlCity + appId + addLanguage + event.lang;
+    this.language.subscribe((lang: string): void => {
+      const openWeatherMapUrl: string = weatherUrlCity + appId + addLanguage + lang;
       this.weatherDataSub = this.httpService.get<weatherModel>(openWeatherMapUrl)
         .pipe(
           catchError(e => {
@@ -57,51 +71,76 @@ export class IndexService {
     });
   }
 
-  getReportNow(data: listDataModel[]): reportNowModel {
-    if (data[0]) {
-      this.reportNow.description = data[0].weather[0].description;
-      this.reportNow.min = this.convertKelvinToDegrees(data[0].main.temp_min);
-      this.reportNow.max = this.convertKelvinToDegrees(data[0].main.temp_max);
-    }
-
-    return this.reportNow;
+  getLanguage(): void {
+    this.language.next(this.translateService.currentLang);
+    this.translateService.onLangChange.subscribe((event: LangChangeEvent) => {
+      this.language.next(event.lang);
+    });
   }
 
-  getReportFiveDays(data: listDataModel[]): reportFiveDaysModel[] {
-    this.reportFiveDays.map((dataInfo: reportFiveDaysModel)=> {
-      dataInfo.data = [];
-      return dataInfo;
-    });
+  getReportNow(){
+    this.reportNow.next(this.storageService.getLocalStorage(localStorageReportNow));
+    this.listData.subscribe((data: listDataModel[]) => {
+      if (data[0]) {
+        this.reportNowData.description = data[0].weather[0].description;
+        this.reportNowData.min = this.convertKelvinToDegrees(data[0].main.temp_min);
+        this.reportNowData.max = this.convertKelvinToDegrees(data[0].main.temp_max);
 
-    data.map((data: listDataModel): void => {
-      let dateTime: string[] = data.dt_txt.split(' ');
-      let date: string = this.convertDateToSlo(dateTime[0]);
-      let time: string = dateTime[1];
-
-      if (!this.dateList.includes(date)) {
-        let dateInfo = {
-          date: date,
-          data: []
-        };
-
-        this.dateList.push(date);
-        this.reportFiveDays.push(dateInfo);
+        this.reportNow.next(this.reportNowData);
+        this.storageService.setLocalStorageReportNow(localStorageReportNow, this.reportNowData);
       }
+    })
+  }
 
-      this.reportFiveDays.map((dataReport: reportFiveDaysModel, j: number): void => {
-        if (date === dataReport.date) {
-          let reportInfo = {
-            time: this.convertTimeToShort(time),
-            temp: this.convertKelvinToDegrees(data.main.temp),
-            description: data.weather[0].description
+  getReportNowData(): Observable<reportNowModel> {
+    return this.reportNow.asObservable();
+  }
+
+  getReportFiveDays(){
+    this.reportFiveDays.next(this.storageService.getLocalStorage(localStorageReportFiveDays));
+    this.listData.subscribe((data: listDataModel[]) => {
+      this.reportFiveDaysData.map((dataInfo: reportFiveDaysModel) => {
+        dataInfo.data = [];
+        return dataInfo;
+      });
+
+      data.map((data: listDataModel): void => {
+        let dateTime: string[] = data.dt_txt.split(' ');
+        let date: string = this.convertDateToSlo(dateTime[0]);
+        let time: string = dateTime[1];
+
+        if (!this.dateList.includes(date)) {
+          let dateInfo = {
+            date: date,
+            data: []
           };
 
-          this.reportFiveDays[j].data.push(reportInfo);
+          this.dateList.push(date);
+          this.reportFiveDaysData.push(dateInfo);
         }
-      });
-    })
 
-    return this.reportFiveDays;
+        this.reportFiveDaysData.map((dataReport: reportFiveDaysModel, j: number): void => {
+          if (date === dataReport.date) {
+            let reportInfo = {
+              time: this.convertTimeToShort(time),
+              temp: this.convertKelvinToDegrees(data.main.temp),
+              description: data.weather[0].description
+            };
+
+            this.reportFiveDaysData[j].data.push(reportInfo);
+          }
+        });
+      })
+
+      if (this.reportFiveDaysData.length !== 0) {
+        this.reportFiveDays.next(this.reportFiveDaysData);
+        this.storageService.setLocalStorageReportFiveDays(localStorageReportFiveDays, this.reportFiveDaysData);
+      }
+    });
+  }
+
+  getReportFiveDaysData(): Observable<reportFiveDaysModel[]> {
+    return this.reportFiveDays.asObservable();
   }
 
   convertDateToSlo(date: string): string {
@@ -114,10 +153,6 @@ export class IndexService {
 
   convertKelvinToDegrees(kelvin: string): number {
     return Math.round(Number(-273.15 + kelvin));
-  }
-
-  getWeatherData(): Observable<listDataModel[]> {
-    return this.listData.asObservable();
   }
 
   ngOnDestroy() {

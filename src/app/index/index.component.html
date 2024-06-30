@@ -21,17 +21,17 @@
         <div class="fields text-center mt-4">
           <div class="row">
             <div class="col-xs-12 col-sm-6 field-left mb-4">
-              <ng-container *ngIf="reportNow">
+              <ng-container *ngIf="reportNow$ | async; let repNow">
                 <div class="text-big-container">
-                  {{ reportNow.min }}&deg;C
+                  {{ repNow.min }}&deg;C
                 </div>
-                <div>{{ "TemeperatureMax" | translate }} {{ reportNow.max }}&deg;C</div>
-                <div>{{ reportNow.description }}</div>
+                <div>{{ "TemeperatureMax" | translate }} {{ repNow.max }}&deg;C</div>
+                <div>{{ repNow.description }}</div>
               </ng-container>
             </div>
             <div class="col-xs-12 col-sm-6 field-right">
-              <ng-container *ngIf="reportFiveDays">
-                <div class="text-container" *ngFor="let result of reportFiveDays">
+              <ng-container *ngIf="reportFiveDays$ | async">
+                <div class="text-container" *ngFor="let result of reportFiveDays$ | async">
                   <div class="date-text">{{ result.date }}</div>
                   <div class="text-data-container d-flex justify-content-between me-2" *ngFor="let info of result.data">
                     <div class="w-25">{{ info.time }}</div>

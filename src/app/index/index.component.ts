@@ -1,37 +1,31 @@
 import {Component, inject} from '@angular/core';
-import {catchError, Subscription} from "rxjs";
+import {Observable, Observer, Subscription} from "rxjs";
 import {IndexService} from "../services/index.service";
 import moment from 'moment/moment.js';
 import { TranslateService, TranslateModule } from "@ngx-translate/core";
 import {reportNowModel} from "../models/reportNow.model";
 import {reportFiveDaysModel} from "../models/reportFiveDays.model";
-import {LocalStorageService} from "../services/localStorage.service";
-import { NgIf, NgFor } from '@angular/common';
-import {city, localStorageReportFiveDays, localStorageReportNow} from "../config";
+import {NgIf, NgFor, AsyncPipe} from '@angular/common';
+import {city} from "../config";
 
 @Component({
     selector: 'app-index',
     templateUrl: './index.component.html',
     styleUrls: ['./index.component.scss'],
     standalone: true,
-    imports: [NgIf, NgFor, TranslateModule]
+    imports: [NgIf, NgFor, TranslateModule, AsyncPipe]
 })
 export class IndexComponent {
-  protected readonly city = city;
-  reportFiveDays: reportFiveDaysModel[] = [];
-  reportNow: reportNowModel = {
-    description: '',
-    min: 0,
-    max: 0
-  };
+  protected readonly city:string = city;
+  reportNow$: Observable<reportNowModel> | undefined;
+  reportFiveDays$: Observable<reportFiveDaysModel[]> | undefined;
   reportDataSub: Subscription = new Subscription();
   iService: IndexService = inject(IndexService);
   date: string = '';
   time: string = '';
 
   constructor(
-    public translateService: TranslateService,
-    private storageService: LocalStorageService
+    public translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -42,6 +36,8 @@ export class IndexComponent {
   refreshData() {
     this.getTime();
     this.getWeatherData();
+    this.iService.getReportNow();
+    this.iService.getReportFiveDays();
   }
 
   getTime() {
@@ -50,22 +46,18 @@ export class IndexComponent {
   }
 
   getWeatherData() {
-    this.reportNow = this.storageService.getLocalStorage(localStorageReportNow);
-    this.reportFiveDays = this.storageService.getLocalStorage(localStorageReportFiveDays);
-
     this.iService.prepareWeatherData();
-    this.reportDataSub = this.iService.getWeatherData()
-      .pipe(
-        catchError((e) => {
-          throw new Error(e);
-        })
-      ).subscribe(value => {
-        this.reportNow = this.iService.getReportNow(value);
-        this.reportFiveDays = this.iService.getReportFiveDays(value);
 
-        this.storageService.setLocalStorageReportNow(localStorageReportNow, this.reportNow);
-        this.storageService.setLocalStorageReportFiveDays(localStorageReportFiveDays, this.reportFiveDays);
-      });
+    this.reportNow$ = new Observable<reportNowModel>((observer: Observer<reportNowModel>): void => {
+      this.iService.getReportNowData().subscribe((data: reportNowModel): void => {
+        observer.next(data);
+      })
+    });
+    this.reportFiveDays$ = new Observable<reportFiveDaysModel[]>((observer: Observer<reportFiveDaysModel[]>): void => {
+      this.iService.getReportFiveDaysData().subscribe((data: reportFiveDaysModel[]): void => {
+        observer.next(data);
+      })
+    });
   }
 
   switchLanguage(language: string) {
