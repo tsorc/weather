@@ -31,8 +31,7 @@ export class IndexComponent {
   ngOnInit(): void {
     this.translateService.use(this.translateService.getDefaultLang());
     this.refreshData();
-    this.iService.getReportNow();
-    this.iService.getReportFiveDays();
+    this.iService.ngOnInit();
   }
 
   refreshData() {
@@ -46,7 +45,7 @@ export class IndexComponent {
   }
 
   getWeatherData() {
-    this.iService.prepareWeatherData();
+    this.iService.prepareWeatherData(this.translateService.currentLang);
 
     this.reportNow$ = new Observable<reportNowModel>((observer: Observer<reportNowModel>): void => {
       this.iService.getReportNowData().subscribe((data: reportNowModel): void => {
@@ -58,11 +57,6 @@ export class IndexComponent {
         observer.next(data);
       })
     });
-  }
-
-  switchLanguage(language: string) {
-    this.translateService.use(language);
-    this.iService.prepareWeatherData();
   }
 
   ngOnDestroy() {

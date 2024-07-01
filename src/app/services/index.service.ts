@@ -17,6 +17,7 @@ import {
   localStorageReportFiveDays
 } from '../config';
 import {LocalStorageService} from "./localStorage.service";
+import {languageModel} from "../models/language.model";
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,7 @@ export class IndexService {
   reportFiveDaysData: reportFiveDaysModel[] = [];
   reportFiveDays: BehaviorSubject<reportFiveDaysModel[]> = new BehaviorSubject<reportFiveDaysModel[]>([])
   dateList: string[] = [];
+  langObsevable: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   constructor(
     private httpService: HttpClient,
@@ -42,36 +44,44 @@ export class IndexService {
     private storageService: LocalStorageService
   ) { }
 
-  prepareWeatherData(): void {
-    this.loaderService.show();
+  ngOnInit(): void {
+    this.changeLanguage();
+    this.getReportNow();
+    this.getReportFiveDays();
+  }
 
-    this.translateService.get('Language').pipe(
-      catchError(e => {
-        this.loaderService.hide();
-        throw new Error(e);
-      })
-    ).subscribe((lang: string) => {
-      const openWeatherMapUrl: string = weatherUrlCity + appId + addLanguage + lang;
-      this.weatherDataSub = this.httpService.get<weatherModel>(openWeatherMapUrl)
-        .pipe(
-          catchError(e => {
-            this.loaderService.hide();
-            throw new Error(e);
-          })
-        ).subscribe((response: weatherModel): void => {
-          map(val => {
-            response.list.map((data: listDataModel) => {
-              let dateTime: string[] = data.dt_txt.split(' ');
-              let date :string = dateTime[0];
-              data.date = date;
-              return data;
-            })
-            return val;
-          })
-          this.listData.next(response.list);
-          this.loaderService.hide();
-        });
+  changeLanguage() {
+    this.translateService.onLangChange.subscribe((data: languageModel): void => {
+      this.langObsevable.next(data.lang);
+    })
+
+    this.langObsevable.subscribe((lang: string) => {
+      this.prepareWeatherData(lang);
     });
+  }
+
+  prepareWeatherData(lang: string): void {
+    this.loaderService.show();
+    const openWeatherMapUrl: string = weatherUrlCity + appId + addLanguage + lang;
+    this.weatherDataSub = this.httpService.get<weatherModel>(openWeatherMapUrl)
+      .pipe(
+        catchError(e => {
+          this.loaderService.hide();
+          throw new Error(e);
+        })
+      ).subscribe((response: weatherModel): void => {
+        map(val => {
+          response.list.map((data: listDataModel) => {
+            let dateTime: string[] = data.dt_txt.split(' ');
+            let date :string = dateTime[0];
+            data.date = date;
+            return data;
+          })
+          return val;
+        })
+        this.listData.next(response.list);
+        this.loaderService.hide();
+      });
   }
 
   getReportNow(){
