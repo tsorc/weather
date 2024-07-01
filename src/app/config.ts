@@ -7,3 +7,4 @@ export const addLanguage: string = '&lang=';
 export const localStorageReportNow: string = 'report_now';
 export const localStorageReportFiveDays: string = 'report_five_days';
 export const slDateFormat: string = 'DD.MM.YYYY';
+export const slHourFormat: string = 'HH:mm:ss';
