@@ -7,7 +7,7 @@ import {reportNowModel} from "../models/reportNow.model";
 import {reportFiveDaysModel} from "../models/reportFiveDays.model";
 import moment from "moment/moment.js";
 import {LoaderService} from "./loader.service";
-import {LangChangeEvent, TranslateService} from "@ngx-translate/core";
+import {TranslateService} from "@ngx-translate/core";
 import {
   weatherUrlCity,
   appId,
@@ -34,7 +34,6 @@ export class IndexService {
   reportFiveDaysData: reportFiveDaysModel[] = [];
   reportFiveDays: BehaviorSubject<reportFiveDaysModel[]> = new BehaviorSubject<reportFiveDaysModel[]>([])
   dateList: string[] = [];
-  language: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   constructor(
     private httpService: HttpClient,
@@ -45,9 +44,13 @@ export class IndexService {
 
   prepareWeatherData(): void {
     this.loaderService.show();
-    this.getLanguage();
 
-    this.language.subscribe((lang: string): void => {
+    this.translateService.get('Language').pipe(
+      catchError(e => {
+        this.loaderService.hide();
+        throw new Error(e);
+      })
+    ).subscribe((lang: string) => {
       const openWeatherMapUrl: string = weatherUrlCity + appId + addLanguage + lang;
       this.weatherDataSub = this.httpService.get<weatherModel>(openWeatherMapUrl)
         .pipe(
@@ -71,16 +74,9 @@ export class IndexService {
     });
   }
 
-  getLanguage(): void {
-    this.language.next(this.translateService.currentLang);
-    this.translateService.onLangChange.subscribe((event: LangChangeEvent) => {
-      this.language.next(event.lang);
-    });
-  }
-
   getReportNow(){
     this.reportNow.next(this.storageService.getLocalStorage(localStorageReportNow));
-    this.listData.subscribe((data: listDataModel[]) => {
+    this.listData.subscribe((data: listDataModel[]): void => {
       if (data[0]) {
         this.reportNowData.description = data[0].weather[0].description;
         this.reportNowData.min = this.convertKelvinToDegrees(data[0].main.temp_min);
@@ -98,7 +94,7 @@ export class IndexService {
 
   getReportFiveDays(){
     this.reportFiveDays.next(this.storageService.getLocalStorage(localStorageReportFiveDays));
-    this.listData.subscribe((data: listDataModel[]) => {
+    this.listData.subscribe((data: listDataModel[]): void => {
       this.reportFiveDaysData.map((dataInfo: reportFiveDaysModel) => {
         dataInfo.data = [];
         return dataInfo;

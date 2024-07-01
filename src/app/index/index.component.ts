@@ -31,13 +31,13 @@ export class IndexComponent {
   ngOnInit(): void {
     this.translateService.use(this.translateService.getDefaultLang());
     this.refreshData();
+    this.iService.getReportNow();
+    this.iService.getReportFiveDays();
   }
 
   refreshData() {
     this.getTime();
     this.getWeatherData();
-    this.iService.getReportNow();
-    this.iService.getReportFiveDays();
   }
 
   getTime() {
@@ -62,6 +62,7 @@ export class IndexComponent {
 
   switchLanguage(language: string) {
     this.translateService.use(language);
+    this.iService.prepareWeatherData();
   }
 
   ngOnDestroy() {
