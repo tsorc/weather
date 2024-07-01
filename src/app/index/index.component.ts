@@ -7,7 +7,7 @@ import {reportNowModel} from "../models/reportNow.model";
 import {reportFiveDaysModel} from "../models/reportFiveDays.model";
 import {LocalStorageService} from "../services/localStorage.service";
 import { NgIf, NgFor } from '@angular/common';
-import {city, localStorageReportFiveDays, localStorageReportNow} from "../config";
+import {city, localStorageReportFiveDays, localStorageReportNow, slDateFormat, slHourFormat} from "../config";
 
 @Component({
     selector: 'app-index',
@@ -45,8 +45,8 @@ export class IndexComponent {
   }
 
   getTime() {
-    this.date = moment().format('DD.MM.YYYY');
-    this.time = moment().format('HH:mm:ss');
+    this.date = moment().format(slDateFormat);
+    this.time = moment().format(slHourFormat);
   }
 
   getWeatherData() {
